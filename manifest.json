@@ -1,0 +1,34 @@
+{
+	"name":"Hello World",
+	"description":"Application to display hello world",
+	"version":"1.0",
+
+	"areas": [
+		{
+			"id":"QHelloWorld",
+			"text":"Hello World",
+			"description":"A Hello World app",
+			"name": "getIndex",
+			"url":"/index",
+			"required_capabilities":["ADMIN"]
+		}
+	],
+
+	"rest_methods": [
+        {
+            "name":"postArielSearch",
+            "url":"/postArielSearch",
+            "method":"POST",
+            "argument_names":[]
+        }
+	],
+
+	"rest_methods": [
+        {
+            "name":"searchIDData",
+            "url":"searchIDData",
+            "method":"GET",
+            "argument_names":[]
+        }
+	]
+}
