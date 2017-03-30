@@ -75,11 +75,27 @@ for (var i = 0, len = response.length; i < len; i++)
 				fillOpacity: 0.5,
 				radius: 500
 		}).addTo(mymap);
+	}
+
+var destinationIP = document.getElementById('destinationData').getAttribute('destinationIp-data');
+destResponse = JSON.parse(destinationIP);
+for (var i = 0, len = destResponse.length; i < len; i++)
+	{
+		var circle = L.circle([destResponse[i].destinationLocationData.latitude, destResponse[i].destinationLocationData.longitude], {
+				color: 'blue',
+				fillColor: '#f03',
+				fillOpacity: 0.5,
+				radius: 500
+		}).addTo(mymap);
+	}
+}
 		//var latitude = response[i].sourceLocationData.latitude;
 	//	var longitude = response[i].sourceLocationData.longitude;
 	//	console.log(latitude);
 	//	console.log(longitude);
-	}
+
+
+
 
  //var latitude = response[0].sourceLocationData.latitude
 //console.log(latitude);
@@ -90,7 +106,7 @@ for (var i = 0, len = response.length; i < len; i++)
 		container: 'map',
 		style: 'mapbox://styles/mapbox/dark-v9'
 	});*/
-}
+
 /*function initMap(json) {
 	container = document.getElementById('map');
 	var width = container.clientWidth;
