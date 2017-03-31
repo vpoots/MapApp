@@ -1,13 +1,3 @@
-var container;
-var scene;
-var camera;
-var cameraHome = { x: 0, y: -300, z: 300 };
-var controls;
-var renderer;
-var projection;
-var mapSize;
-var landColor = 0xe0e0e0 //grey //0x4682b4;	// steel blue
-var backgroundColor =  0x001e43;	// midnight blue
 //var BASE_URL = document.getElementById('url-info').getAttribute('base-url');
 //var DATA = document.getElementById('data').getAttribute('sourceIp-data');
 
@@ -25,71 +15,87 @@ function writeConsole( str ) {
 }*/
 
 function init() {
-	//scene = new THREE.Scene();
-	//healthLog();
+
 	drawWorld();
 }
 
 function drawWorld() {
-	//d3.json("static/map/world.topojson", function(json) {
-		//var mesh;
 
-		//find location
-		getSourceIp();
 		initMap();
-		//display sourceip
-		//display desintationip
-		//render();
-		//animate();
-
-
-		//window.addEventListener('resize', function() {
-			// renderer.setSize(window.innerWidth, window.innerHeight);
-			// camera.aspect = window.innerWidth / window.innerHeight;
-			//renderer.setSize(container.clientWidth, container.clientHeight);
-			//camera.aspect = container.clientWidth / container.clientHeight;
-		//	camera.updateProjectionMatrix();
-	//	}, false );
-	//});
 }
 
-function initMap(response){
+function initMap(){
 	//var mymap = L.map('map').setView([51.505, -0.09], 13);
 	var mymap = L.map('map', {
-		center: [51, 1],
-		zoom: 2.3
+		center: [45, 10],
+		zoom: 2.3,
+		minZoom: 2,
+		maxZoom: 18
 	});
-
 	L.tileLayer('https://api.mapbox.com/styles/v1/vpoots/cj0trsbn900w92rt8m0pe4nml/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoidnBvb3RzIiwiYSI6ImNqMHRueDB0ZDAwMjUycXFseG9wcmJvZXYifQ.D1OlD9G6iR5AkjlzQ0pQFw', {
-attribution:"MapBox"
-//mapbox://styles/vpoots/cj0trsbn900w92rt8m0pe4nml /v1/mapbox/light-v9/tiles/256/
-}).addTo(mymap);
+	attribution:"MapBox"
+	//mapbox://styles/vpoots/cj0trsbn900w92rt8m0pe4nml /v1/mapbox/light-v9/tiles/256/
+	}).addTo(mymap);
 
-var sourceIP = document.getElementById('data').getAttribute('sourceIp-data');
-response = JSON.parse(sourceIP);
-for (var i = 0, len = response.length; i < len; i++)
-	{
-		var circle = L.circle([response[i].sourceLocationData.latitude, response[i].sourceLocationData.longitude], {
-				color: 'red',
-				fillColor: '#f03',
-				fillOpacity: 0.5,
-				radius: 500
-		}).addTo(mymap);
-	}
+	var sourceIP = document.getElementById('data').getAttribute('flowsData');
+	response = JSON.parse(sourceIP);
+	//creating source ip circle
+	for (var i = 0, len = response.length; i < len; i++)
+		{
+			var circle = L.circle([response[i].sourceLocationData.latitude, response[i].sourceLocationData.longitude], {
+					color: 'red',
+					fillColor: '#f03',
+					fillOpacity: 0.5,
+					radius: 500
+			}).addTo(mymap);
+		}
+	//creating destination ip circle
+	for (var i = 0, len = response.length; i < len; i++)
+		{
+			var circle = L.circle([response[i].destinationLocationData.latitude, response[i].destinationLocationData.longitude], {
+					color: 'blue',
+					fillColor: '#f03',
+					fillOpacity: 0.5,
+					radius: 500
+			}).addTo(mymap);
+		}
+	//creating path between source and destination ip
+	for (var i = 0, len = response.length; i < len; i++)
+		{
+			var pointA =new L.LatLng(response[i].sourceLocationData.latitude, response[i].sourceLocationData.longitude);
+			var pointB =new L.LatLng(response[i].destinationLocationData.latitude, response[i].destinationLocationData.longitude);
+			var pointList = [pointA, pointB];
+			var info = response[i].ipAddr
+			var firstpolyline = new L.Polyline(pointList, {
+			    color: 'purple',
+			    weight: 3,
+			    opacity: 0.5,
+			    smoothFactor: 1
+			});
+			firstpolyline.addTo(mymap);
+			var sourceipadd = response[i].ipAddr;
+			var destinationipaddr = response[i].ipAddrDest;
+			var sourcePort = response[i].sourcePort;
+			var destinationPort = response[i].destinationPort;
+			var sourceBytes = response[i].sourceBytes;
+			var destinationBytes = response[i].destinationBytes;
+			var sourcePackets = response[i].sourcePackets;
+			var destinationPackets = response[i].destinationPackets;
 
-var destinationIP = document.getElementById('destinationData').getAttribute('destinationIp-data');
-destResponse = JSON.parse(destinationIP);
-for (var i = 0, len = destResponse.length; i < len; i++)
-	{
-		var circle = L.circle([destResponse[i].destinationLocationData.latitude, destResponse[i].destinationLocationData.longitude], {
-				color: 'blue',
-				fillColor: '#f03',
-				fillOpacity: 0.5,
-				radius: 500
-		}).addTo(mymap);
-	}
+			firstpolyline.bindPopup("<h1>Network Traffic Information</h1><p>Source IP: " + sourceipadd +"<br /> Destination IP: " + destinationipaddr + "<br /> Source Port: "+ sourcePort + "<br /> Destination Port: "+ destinationPort +
+			"<br /> Source Bytes: "+ sourceBytes + "<br /> Destination Bytes: "+ destinationBytes + "<br /> Source Packets: "+ sourcePackets + "<br /> Destination Packets: "+ destinationPackets +  "</p>")
+			/*var popup = L.popup()
+			.setLatLng(pointA)
+	    .setContent('<p>Hello world!<br />This is a nice popup.</p>')
+	    .openOn(mymap);*/
+		}
+			/*firstpolyline.addEventListener('click dblclick', function(e){
+				alert(e.)
+			});*/
 }
-		//var latitude = response[i].sourceLocationData.latitude;
+
+
+	//var latitude = response[i].sourceLocationData.latitude;
 	//	var longitude = response[i].sourceLocationData.longitude;
 	//	console.log(latitude);
 	//	console.log(longitude);
@@ -216,14 +222,4 @@ function getSourceIp(response) {
 
 	//success(response)
 	//alert(JSON.stringify(response));
-}
-
-function animate() {
-	requestAnimationFrame(animate);
-	controls.update();
-	render();
-}
-
-function render() {
-	renderer.render(scene, camera);
 }

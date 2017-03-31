@@ -39,7 +39,7 @@ def restData():
 	try:
 		qpylib.log("hi")
 		headers = {'content-type' : 'text/plain'}
-		searchQuery = {'query_expression' : "select sourceip, destinationip from \"flows\" limit 5",}
+		searchQuery = {'query_expression' : "select sourceip, destinationip, sourceport, destinationport, sourcebytes, destinationbytes, sourcepackets, destinationpackets from \"flows\" limit 5",}
 		apiResponse = qpylib.REST( 'post', 'api/ariel/searches', headers=headers, params=searchQuery)
 		qpylib.log(apiResponse.content)
 		response = json.loads(apiResponse.content)
@@ -104,7 +104,64 @@ def flowData(statusSearch_id):
 		#	sourceIps['ipAddr'] = x['flows']['sourceip']
 		#	qpylib.log( "result source ip " + x)
 		qpylib.log('flowData flows:   ' + json.dumps(flowData['flows'],indent=2))
+		for x in flowData['flows']:
+			flowsData = {}
+			#destinationIP = {}
+			qpylib.log('inside flowdata loop')
+			#sourceIP['ipAddr'] = flowData['flows']['sourceip']
+			flowsData['ipAddr'] = x['sourceip']
+			flowsData['ipAddrDest'] = x['destinationip']
+			flowsData['sourcePort'] = x['sourceport']
+			flowsData['destinationPort'] = x['destinationport']
+			flowsData['sourceBytes'] = x['sourcebytes']
+			flowsData['destinationBytes'] = x['destinationbytes']
+			flowsData['sourcePackets'] = x['sourcepackets']
+			flowsData['destinationPackets'] = x['destinationpackets']
+			#flowDataJson = json.loads(flowData)
+			#qpylib.log(flowDataJson)
+			#sourceIP[ipAddr] = flowDataJson['sourceip']
+			qpylib.log('source ip:   ' + json.dumps(x['sourceip']))
+			qpylib.log('destination ip:   ' + json.dumps(x['destinationip']))
+			qpylib.log('source port:   ' + json.dumps(x['sourceport']))
+			#qpylib.log('source ip ipadd  ' + json.dumps(sourceIP['ipAddr']))
+			#geoIpData.extend(sourceIP and destinationIP)
+			geoIpData.append(flowsData)
+			#geoIpData.append(destinationIP)
+			#geoIpData = dict(sourceIP.items() + destinationIP.items())
 
+
+		qpylib.log('geoIpData : ' + json.dumps(geoIpData, indent=2))
+
+		for y in geoIpData:
+			ipaddr = y['ipAddr']
+			qpylib.log('inside flowdata loop y')
+			# write function where you request response from new freegeoip api
+			# eg. locationData = return of getLocationData(ipaddr)
+			#y['locationData'] = locationData
+			locationData = getLocationData(ipaddr)
+			qpylib.log('getLocationData result:   ' + json.dumps(locationData,indent=2))
+			y['sourceLocationData'] = locationData
+
+		for b in geoIpData:
+			ipaddrdest = b['ipAddrDest']
+			qpylib.log('inside flowdata loop dest b')
+			locationDataDest = getLocationDataDest(ipaddrdest)
+			qpylib.log('getLocationDataDest result:   ' + json.dumps(locationDataDest,indent=2))
+			b['destinationLocationData'] = locationDataDest
+
+
+		qpylib.log('final geoIpData : ' + json.dumps(geoIpData, indent = 2))
+
+		'''
+		qpylib.log('final geoIpDataDestination : ' + json.dumps(geoIpDataDestination, indent = 2))
+		flowsData = [5]*(len(geoIpData)+len(geoIpDataDestination))
+		flowsData[::2] = geoIpData
+		flowsData[1::2] = geoIpDataDestination
+		qpylib.log('final DATA : ' + json.dumps(flowsData, indent = 2))
+		#data = geoIpData + geoIpDataDestination
+		#qpylib.log('final DATA : ' + json.dumps(data, indent = 2))
+		'''
+		'''
 		for x in flowData['flows']:
 			sourceIP = {}
 			qpylib.log('inside flowdata loop')
@@ -117,11 +174,12 @@ def flowData(statusSearch_id):
 			#qpylib.log('source ip ipadd  ' + json.dumps(sourceIP['ipAddr']))
 			geoIpData.append(sourceIP)
 
+
 		qpylib.log('geoIpData : ' + json.dumps(geoIpData, indent=2))
 
 		for y in geoIpData:
 			ipaddr = y['ipAddr']
-
+			qpylib.log('inside flowdata loop y')
 			# write function where you request response from new freegeoip api
 			# eg. locationData = return of getLocationData(ipaddr)
 			#y['locationData'] = locationData
@@ -132,22 +190,28 @@ def flowData(statusSearch_id):
 		qpylib.log('final geoIpData : ' + json.dumps(geoIpData, indent = 2))
 
 		for a in flowData['flows']:
+			qpylib.log('inside flowdata loop dest')
 			destinationIP = {}
 			destinationIP['ipAddrDest'] = a['destinationip']
 			qpylib.log('destination ip:   ' + json.dumps(a['destinationip']))
 			geoIpDataDestination.append(destinationIP)
 
-		qpylib.log('geoIpDataDestination : ' + json.dumps(geoIpDataDestination, indent=2))
+		qpylib.log('geoIpDataDestination : ' + json.dumps(geoIpData, indent=2))
 
 		for b in geoIpDataDestination:
 			ipaddrdest = b['ipAddrDest']
+			qpylib.log('inside flowdata loop dest b')
 			locationDataDest = getLocationDataDest(ipaddrdest)
 			qpylib.log('getLocationDataDest result:   ' + json.dumps(locationDataDest,indent=2))
 			b['destinationLocationData'] = locationDataDest
 
-		qpylib.log('final geoIpDataDest : ' + json.dumps(geoIpDataDestination, indent = 2))
+		qpylib.log('final geoIpDataDestination : ' + json.dumps(geoIpDataDestination, indent = 2))
 
-		return render_template("map.html", data=json.dumps(geoIpData), destinationData=json.dumps(geoIpDataDestination), base_url=qpylib.get_app_base_url())
+		#data = geoIpData + geoIpDataDestination
+		#qpylib.log('final DATA : ' + json.dumps(data, indent = 2))
+		'''
+		return render_template("map.html", data=json.dumps(geoIpData), base_url=qpylib.get_app_base_url())
+		#return render_template("map.html", data=json.dumps(data), base_url=qpylib.get_app_base_url())
 
 	except Exception as e:
 		qpylib.log( "Error ---- "  + str(e), level='error' )
@@ -206,7 +270,7 @@ def getLocationDataDest(ipaddrdest):
 	#               locationData['latitude'] = response['latitude']
 	#return locationData
 	try:
-	#	qpylib.log('entered try of getLocationData destination')
+		qpylib.log('entered try of getLocationData destination')
 		#headers = {'content-type' : 'text/plain'}
 		destinationLocationAPI = requests.get('http://freegeoip.net/json/%s' % ipaddrdest)
 	#	qpylib.log('successfully retrieved locationAPI response')
@@ -219,6 +283,7 @@ def getLocationDataDest(ipaddrdest):
 	#	qpylib.log('latitude :: %s' % result['latitude'])
 
 	#	qpylib.log(json.dumps(destinationLocationData, indent = 2))
+		qpylib.log('got destination')
 		return destinationLocationData
 
 	except Exception as e:
