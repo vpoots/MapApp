@@ -1,0 +1,54 @@
+<!>
+<HTML>
+<HEAD>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.css' rel='stylesheet'/>
+	<link rel="stylesheet" type="text/css" src="static/css/leaflet.css">/>
+	<link href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.3/leaflet.css' rel='stylesheet'>
+<STYLE type="text/css">
+<!--
+BODY
+{
+  background-color: #1c284a
+}
+
+#map{
+	height: 700px;
+	width: 1200px;
+	position:relative;
+	display: block;
+	margin: auto;
+}
+#pageheader{
+	color: #5aaafa;
+	text-align: center;
+}
+-->
+</STYLE>
+<title>MAP</title>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="static/js/three.min.js"></script>
+<script type="text/javascript" src="static/js/OrbitControls.js"></script>
+<script type="text/javascript" src="static/js/d3.v3.min.js"></script>
+<script type="text/javascript" src="static/js/d3-threeD.js"></script>
+<script type="text/javascript" src="static/js/topojson.v1.min.js"></script>
+<script type="text/javascript" src="static/js/buildMapGUIColour13.js"></script>
+<script src='https://api.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.js'></script>
+<script type="text/javascript" src="static/js/leaflet.js"></script>
+</HEAD>
+<BODY onload="map:init()">
+<div id="url-info" base-url="{{base_url|safe}}"></div>
+<div id="data" class="info" flowsData="{{data}}"><div>
+<div id="destData" class="info" destinationIp-data="{{destinationData}}"><div>
+<div id="pageheader" class="pagebanner">
+    <h1>Network Activity Map</h1>
+</div>
+<div id="map">
+</div>
+<div>
+{% for item in data %}
+    <span id="test" onclick=someFunction({{ item|safe }});>{{ item }}</span>
+{% endfor %}
+<div>
+</BODY>
+
+</HTML>
